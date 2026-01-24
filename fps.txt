@@ -1,0 +1,17 @@
+--// FPS Lock Script (set FPS = 15)
+-- Chỉ chạy khi đã lấy được tọa độ nhân vật
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+-- Đợi cho tới khi nhân vật và HumanoidRootPart sẵn sàng
+repeat task.wait(1)
+until player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+
+-- Khi nhân vật có tọa độ, tiến hành giới hạn FPS
+if setfpscap then
+    setfpscap(15) -- hoặc 10 nếu em muốn chậm hơn
+    print("✅ FPS đã bị giới hạn sau khi nhân vật load xong.")
+else
+    warn("⚠️ Executor của bạn không hỗ trợ setfpscap().")
+end

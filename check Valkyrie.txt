@@ -1,0 +1,50 @@
+-- [[ SCRIPT AUTO CHECK VALKYRIE HELM ]] --
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local player = Players.LocalPlayer
+
+if game.Players.LocalPlayer.Name == "baohan_200" then
+    print("⛔ Script này bị chặn trên tài khoản: baohan_200")
+    print("⚠️ Lý do: Tài khoản này dành riêng cho việc Hop Server.")
+    return -- Dừng toàn bộ script tại đây
+end
+
+-- Tên file theo định dạng: Username.txt
+local fileName = player.Name .. ".txt"
+
+print("🛡️ Đang kích hoạt chế độ quét Valkyrie Helm...")
+
+spawn(function()
+    while true do
+        wait(2) -- Kiểm tra mỗi 2 giây
+        
+        local success, err = pcall(function()
+            local remote = ReplicatedStorage.Remotes:FindFirstChild("CommF_")
+            if remote then
+                -- Lấy toàn bộ danh sách item trong kho
+                local inventory = remote:InvokeServer("getInventory")
+                
+                if inventory then
+                    for _, item in pairs(inventory) do
+                        -- Kiểm tra tên item
+                        if item.Name == "Valkyrie Helm" then
+                            -- Nếu tìm thấy: Ghi file
+                            writefile(fileName, "Completed-Valkyrie")
+                            
+                            print("✅ ĐÃ TÌM THẤY VALKYRIE HELM!")
+                            print("📁 Đã lưu file: " .. fileName)
+                            
+                            -- Dừng vòng lặp (thoát script) để không spam ghi file
+                            while true do wait(99999) end 
+                        end
+                    end
+                end
+            end
+        end)
+
+        if not success then
+            warn("Lỗi check inventory: " .. tostring(err))
+        end
+    end
+end)

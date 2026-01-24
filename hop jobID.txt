@@ -1,0 +1,138 @@
+-- [[ SCRIPT 2: CHECK FILE & HOP SERVER (FIXED RE-HOP) ]] --
+
+-- // SERVICES //
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+
+local player = Players.LocalPlayer
+
+-- // CHECK USERNAME //
+if player.Name ~= "baohan_200" then
+    warn("⛔ Script này chỉ chạy trên tài khoản: baohan_200")
+    return
+end
+
+-- // CONFIG //
+local folderName = "mm"
+local checkInterval = 3 
+local isTeleporting = false -- Biến khóa: Chặn hop liên tục
+
+print("⏳ Đang chờ game load xong hẳn...")
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
+
+print("⏳ Đang chờ tọa độ thật của nhân vật...")
+
+-- // WAIT FOR REAL POSITION //
+local function waitForRealPosition()
+    local character = player.Character or player.CharacterAdded:Wait()
+    local hrp = character:WaitForChild("HumanoidRootPart", 10)
+
+    if not hrp then
+        warn("❌ Không tìm thấy HumanoidRootPart")
+        return false
+    end
+
+    -- Chờ nhân vật rớt xuống đất hẳn hoi (tránh lơ lửng khi vừa vào)
+    repeat
+        task.wait(0.5)
+    until hrp.Position and hrp.Position.Magnitude > 0
+    
+    print("📍 Đã xác nhận tọa độ thật:", hrp.Position)
+    return true
+end
+
+if not waitForRealPosition() then return end
+
+print("✅ Đã kích hoạt chế độ săn God's Chalice (FIXED)")
+
+-- // MAIN LOOP //
+task.spawn(function()
+    while true do
+        task.wait(checkInterval)
+
+        -- Nếu đang thực hiện lệnh teleport rồi thì không check nữa
+        if isTeleporting then 
+            print("🚀 Đang trong tiến trình chuyển server, tạm dừng check...")
+            continue 
+        end
+
+        pcall(function()
+            if not isfolder(folderName) then return end
+
+            local files = listfiles(folderName)
+            local validServers = {}
+            local currentTime = os.time()
+            local amIInTargetServer = false -- Biến kiểm tra xem mình có đang ở đúng server cần đến không
+
+            -- 1️⃣ Đọc & lọc file hợp lệ
+            for _, file in ipairs(files) do
+                if file:sub(-4) == ".txt" then
+                    local success, content = pcall(readfile, file)
+                    if success then
+                        local data = HttpService:JSONDecode(content)
+
+                        -- Chỉ lấy file mới (dưới 5 phút)
+                        if data.TimeCheck and (currentTime - data.TimeCheck) < 300 then
+                            -- Nếu JobID trùng với server hiện tại -> Đánh dấu là mình đang ở đúng chỗ
+                            if data.JobID == game.JobId then
+                                amIInTargetServer = true
+                                print("✅ Đang ở trong server nhiệm vụ. Giữ vị trí!")
+                            else
+                                table.insert(validServers, data)
+                            end
+                        end
+                    end
+                end
+            end
+
+            -- 2️⃣ Logic quyết định hop
+            if amIInTargetServer then
+                -- Nếu đang ở đúng server có file, TUYỆT ĐỐI KHÔNG HOP
+                return 
+            end
+
+            -- Sắp xếp: Ưu tiên file mới nhất
+            table.sort(validServers, function(a, b)
+                return a.TimeCheck > b.TimeCheck
+            end)
+
+            if #validServers > 0 then
+                local target = validServers[1]
+
+                -- Check kỹ lại một lần nữa để chắc chắn không hop nhầm vào server hiện tại
+                if game.JobId ~= target.JobID and not isTeleporting then
+                    print("🚀 PHÁT HIỆN MỤC TIÊU:", target.Username)
+                    print("🕒 Thời gian file:", target.DateString)
+                    print("✈️ Bắt đầu Hop Server...")
+                    
+                    isTeleporting = true -- Kích hoạt khóa
+                    
+                    -- Dùng pcall để teleport, nếu lỗi thì mở lại khóa
+                    local success, err = pcall(function()
+                        TeleportService:TeleportToPlaceInstance(
+                            target.PlaceID,
+                            target.JobID,
+                            player
+                        )
+                    end)
+                    
+                    if not success then
+                        warn("❌ Teleport thất bại:", err)
+                        isTeleporting = false -- Mở lại khóa nếu lỗi
+                    end
+                end
+            else
+                print("💤 Không có server nào ngon hơn, đang chờ...")
+            end
+        end)
+    end
+end)
+
+-- Reset khóa nếu nhân vật chết (đề phòng)
+player.CharacterAdded:Connect(function()
+    isTeleporting = false
+    waitForRealPosition()
+end)

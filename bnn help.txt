@@ -1,0 +1,24 @@
+-- 1. Đợi game load xong
+repeat wait() until game:IsLoaded() and game.Players.LocalPlayer
+
+-- 2. KIỂM TRA USERNAME (WHITELIST)
+-- Nếu tên KHÔNG PHẢI là "baohan_200" thì dừng lại ngay.
+if game.Players.LocalPlayer.Name ~= "baohan_200" then
+    warn("Lỗi: Script chỉ dành riêng cho tài khoản baohan_200!")
+    -- Có thể thêm thông báo lên màn hình nếu muốn:
+    pcall(function()
+        game.StarterGui:SetCore("SendNotification", {
+            Title = "Access Denied",
+            Text = "Script chỉ chạy trên tài khoản: baohan_200",
+            Duration = 10
+        })
+    end)
+    return -- Lệnh này sẽ ngắt script, không chạy phần bên dưới
+end
+
+-- 3. Phần Config gốc của bạn
+getgenv().Config = {
+		["Auto Touch Pad Haki"] = true,
+}
+getgenv().Key = "e9162fb60364a89d94d75009"
+loadstring(game:HttpGet("https://raw.githubusercontent.com/obiiyeuem/vthangsitink/main/BananaHub.lua"))()
