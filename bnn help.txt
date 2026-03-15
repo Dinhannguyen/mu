@@ -2,7 +2,7 @@
 repeat wait() until game:IsLoaded() and game.Players.LocalPlayer
 
 -- 2. KIỂM TRA USERNAME (WHITELIST)
--- Nếu tên KHÔNG PHẢI là "baohan_200" thì dừng lại ngay.
+-- Nếu tên KHÔNG PHẢI là "G10n0g10vanna" thì dừng lại ngay.
 if game.Players.LocalPlayer.Name ~= "baohan_200" then
     warn("Lỗi: Script chỉ dành riêng cho tài khoản baohan_200!")
     -- Có thể thêm thông báo lên màn hình nếu muốn:
