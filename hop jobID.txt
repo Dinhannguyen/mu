@@ -8,7 +8,7 @@ local HttpService = game:GetService("HttpService")
 local player = Players.LocalPlayer
 
 -- // CHECK USERNAME //
-if player.Name ~= "baohan_200" then
+if player.Name ~= "G10n0g10vanna" then
     warn("⛔ Script này chỉ chạy trên tài khoản: baohan_200")
     return
 end
