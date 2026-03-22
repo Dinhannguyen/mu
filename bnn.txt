@@ -2,7 +2,7 @@
 repeat wait() until game:IsLoaded() and game.Players.LocalPlayer
 
 -- KIỂM TRA USERNAME: Nếu là "NS5Z28" thì dừng lại ngay lập tức
-if game.Players.LocalPlayer.Name == "baohan_200" then
+if game.Players.LocalPlayer.Name == "NS5Z28" then
     warn("Script đã bị chặn chạy trên tài khoản này!")
     return -- Lệnh này sẽ ngắt script, không cho chạy các dòng bên dưới
 end
