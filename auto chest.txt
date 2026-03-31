@@ -4,7 +4,7 @@ wait(4)
 if game.Players.LocalPlayer.Name == "NS5Z28" then
     print("⛔ Script này bị chặn trên tài khoản: baohan_200")
     print("⚠️ Lý do: Tài khoản này dành riêng cho việc Hop Server.")
-    return -- Dừng toàn bộ script tại đây
+    return
 end
 
 -- CÁC DỊCH VỤ (SERVICES)
@@ -33,7 +33,7 @@ local indraSpawned = false
 local teleportingToBoss = false
 local eliteBossPaused = false
 
--- THIẾT LẬP TÌM KIẾM SERVER (HỆ THỐNG MỚI)
+-- THIẾT LẬP TÌM KIẾM SERVER
 local targetCountMin = 1
 local targetCountMax = 4
 local targetRegion = "Singapore"
@@ -42,7 +42,7 @@ local badServers = {}
 
 -- TỌA ĐỘ RƯƠNG
 local coords = {
-Vector3.new(-16944, 71, 1130),
+    Vector3.new(-16944, 71, 1130),
 Vector3.new(-16818, 221, 285),
 Vector3.new(-16599, 153, -166),
 Vector3.new(-16460, 365, 307),
@@ -158,21 +158,23 @@ Vector3.new(5898, 1206, 858),
 Vector3.new(6185, 370, -898),
 Vector3.new(6491, 626, 595),
 Vector3.new(6745, 221, -596)
-
 }
 
 -- Notification
 local function notify(title, text)
-    StarterGui:SetCore("SendNotification", {Title = title, Text = text, Duration = 7})
+    StarterGui:SetCore("SendNotification", {
+        Title = title,
+        Text = text,
+        Duration = 7
+    })
 end
 
--- TẠO GUI MỚI
+-- TẠO GUI
 local screenGui = Instance.new("ScreenGui")
 screenGui.Name = "AutoChestGUI_Final"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = player:WaitForChild("PlayerGui")
 
--- Main Frame
 local mainFrame = Instance.new("Frame")
 mainFrame.Size = UDim2.new(0, 260, 0, 150)
 mainFrame.Position = UDim2.new(1, -270, 1, -160)
@@ -184,7 +186,6 @@ local mainCorner = Instance.new("UICorner")
 mainCorner.CornerRadius = UDim.new(0, 10)
 mainCorner.Parent = mainFrame
 
--- Gradient
 local gradient = Instance.new("UIGradient")
 gradient.Color = ColorSequence.new({
     ColorSequenceKeypoint.new(0, Color3.fromRGB(35, 35, 45)),
@@ -193,14 +194,12 @@ gradient.Color = ColorSequence.new({
 gradient.Rotation = 45
 gradient.Parent = mainFrame
 
--- Border Glow
 local glow = Instance.new("UIStroke")
 glow.Color = Color3.fromRGB(150, 100, 255)
 glow.Thickness = 1.5
 glow.Transparency = 0.5
 glow.Parent = mainFrame
 
--- Header
 local header = Instance.new("Frame")
 header.Size = UDim2.new(1, 0, 0, 32)
 header.BackgroundColor3 = Color3.fromRGB(150, 100, 255)
@@ -211,7 +210,6 @@ local headerCorner = Instance.new("UICorner")
 headerCorner.CornerRadius = UDim.new(0, 10)
 headerCorner.Parent = header
 
--- Title
 local title = Instance.new("TextLabel")
 title.Size = UDim2.new(1, -40, 1, 0)
 title.Position = UDim2.new(0, 10, 0, 0)
@@ -223,7 +221,6 @@ title.Font = Enum.Font.GothamBold
 title.TextXAlignment = Enum.TextXAlignment.Left
 title.Parent = header
 
--- Minimize Button
 local minimizeBtn = Instance.new("TextButton")
 minimizeBtn.Size = UDim2.new(0, 28, 0, 28)
 minimizeBtn.Position = UDim2.new(1, -32, 0, 2)
@@ -239,14 +236,12 @@ local minCorner = Instance.new("UICorner")
 minCorner.CornerRadius = UDim.new(0, 6)
 minCorner.Parent = minimizeBtn
 
--- Content
 local content = Instance.new("Frame")
 content.Size = UDim2.new(1, -16, 1, -40)
 content.Position = UDim2.new(0, 8, 0, 36)
 content.BackgroundTransparency = 1
 content.Parent = mainFrame
 
--- Toggle Button
 local toggleBtn = Instance.new("TextButton")
 toggleBtn.Size = UDim2.new(1, 0, 0, 32)
 toggleBtn.BackgroundColor3 = Color3.fromRGB(50, 200, 100)
@@ -260,7 +255,6 @@ local btnCorner = Instance.new("UICorner")
 btnCorner.CornerRadius = UDim.new(0, 7)
 btnCorner.Parent = toggleBtn
 
--- Status Label
 local statusLabel = Instance.new("TextLabel")
 statusLabel.Size = UDim2.new(1, 0, 0, 64)
 statusLabel.Position = UDim2.new(0, 0, 0, 36)
@@ -273,7 +267,7 @@ statusLabel.TextWrapped = true
 statusLabel.TextYAlignment = Enum.TextYAlignment.Top
 statusLabel.Parent = content
 
--- Minimize Functionality
+-- Minimize
 local isMinimized = false
 minimizeBtn.MouseButton1Click:Connect(function()
     isMinimized = not isMinimized
@@ -319,8 +313,10 @@ end)
 -- CHECK INDRA
 local function checkIndra()
     local enemies = Workspace:FindFirstChild("Enemies")
-    if not enemies then return false, nil, nil end
-    
+    if not enemies then
+        return false, nil, nil
+    end
+
     for _, model in pairs(enemies:GetChildren()) do
         if model:IsA("Model") then
             local name = model.Name:lower()
@@ -333,6 +329,7 @@ local function checkIndra()
             end
         end
     end
+
     return false, nil, nil
 end
 
@@ -341,11 +338,16 @@ spawn(function()
     while true do
         wait(1)
         pcall(function()
-            local questUI = player.PlayerGui:FindFirstChild("Main"):FindFirstChild("Quest")
+            local mainGui = player.PlayerGui:FindFirstChild("Main")
+            local questUI = mainGui and mainGui:FindFirstChild("Quest")
+
             if questUI and questUI.Visible then
-                local titleContainer = questUI:FindFirstChild("Container"):FindFirstChild("QuestTitle")
-                if titleContainer then
-                    local titleText = titleContainer:FindFirstChild("Title").Text
+                local container = questUI:FindFirstChild("Container")
+                local titleContainer = container and container:FindFirstChild("QuestTitle")
+                local titleLabel = titleContainer and titleContainer:FindFirstChild("Title")
+
+                if titleLabel then
+                    local titleText = titleLabel.Text
                     if titleText:find("Deandre") or titleText:find("Diablo") or titleText:find("Urban") then
                         if not eliteBossPaused then
                             eliteBossPaused = true
@@ -370,18 +372,27 @@ end)
 
 -- NoClip Utils
 local noClipConnection = nil
+
 local function enableNoClip()
-    if noClipConnection then return end
+    if noClipConnection then
+        return
+    end
+
     noClipConnection = RunService.Stepped:Connect(function()
         if teleportingToBoss and player.Character then
             for _, v in pairs(player.Character:GetDescendants()) do
-                if v:IsA("BasePart") then v.CanCollide = false end
+                if v:IsA("BasePart") then
+                    v.CanCollide = false
+                end
             end
-            if player.Character:FindFirstChild("Humanoid") then
-                player.Character.Humanoid:ChangeState(11)
+
+            local humanoid = player.Character:FindFirstChild("Humanoid")
+            if humanoid then
+                humanoid:ChangeState(11)
             end
-            if player.Character:FindFirstChild("HumanoidRootPart") then
-                local hrp = player.Character.HumanoidRootPart
+
+            local hrp = player.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then
                 hrp.Velocity = Vector3.new(0, 0, 0)
                 hrp.RotVelocity = Vector3.new(0, 0, 0)
             end
@@ -398,11 +409,16 @@ end
 
 -- Camera Utils
 local cameraLocked = false
+
 local function lockCamera(targetPos)
-    if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then return end
+    if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
+        return
+    end
+
     cameraLocked = true
-    local cam = workspace.CurrentCamera
+    local cam = Workspace.CurrentCamera
     cam.CameraType = Enum.CameraType.Scriptable
+
     spawn(function()
         while cameraLocked and player.Character and player.Character:FindFirstChild("HumanoidRootPart") do
             cam.CFrame = CFrame.new(player.Character.HumanoidRootPart.Position, targetPos)
@@ -413,39 +429,98 @@ end
 
 local function unlockCamera()
     cameraLocked = false
-    workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
+    Workspace.CurrentCamera.CameraType = Enum.CameraType.Custom
+end
+
+-- Input / Sit Utils
+local function startHoldingSpace()
+    if spaceConnection then
+        return
+    end
+
+    spaceConnection = RunService.RenderStepped:Connect(function()
+        if autoTeleEnabled and not specialItemFound and not indraSpawned and not eliteBossPaused then
+            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Space, false, game)
+        end
+    end)
+end
+
+local function stopHoldingSpace()
+    if spaceConnection then
+        spaceConnection:Disconnect()
+        spaceConnection = nil
+        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Space, false, game)
+    end
+end
+
+local function standUp()
+    if not isSitting then
+        return
+    end
+
+    isSitting = false
+
+    local humanoid = player.Character and player.Character:FindFirstChild("Humanoid")
+    if humanoid then
+        humanoid.Sit = false
+        humanoid.Jump = true
+    end
+
+    if invisibleSeat and invisibleSeat.Parent then
+        invisibleSeat:Destroy()
+        invisibleSeat = nil
+    end
+
+    if sitConnection then
+        sitConnection:Disconnect()
+        sitConnection = nil
+    end
 end
 
 -- Item Checks
 local function checkForDarkFruit()
     local backpack = player:FindFirstChild("Backpack")
     local character = player.Character
+
     if backpack then
         for _, item in ipairs(backpack:GetChildren()) do
-            if item.Name:lower():find("dark") then return true, item.Name end
+            if item.Name:lower():find("dark") then
+                return true, item.Name
+            end
         end
     end
+
     if character then
         for _, item in ipairs(character:GetChildren()) do
-            if item:IsA("Tool") and item.Name:lower():find("dark") then return true, item.Name end
+            if item:IsA("Tool") and item.Name:lower():find("dark") then
+                return true, item.Name
+            end
         end
     end
+
     return false, nil
 end
 
 local function checkForGodsChalice()
     local backpack = player:FindFirstChild("Backpack")
     local character = player.Character
+
     if backpack then
         for _, item in ipairs(backpack:GetChildren()) do
-            if item.Name == "God's Chalice" then return true, item.Name end
+            if item.Name == "God's Chalice" then
+                return true, item.Name
+            end
         end
     end
+
     if character then
         for _, item in ipairs(character:GetChildren()) do
-            if item:IsA("Tool") and item.Name == "God's Chalice" then return true, item.Name end
+            if item:IsA("Tool") and item.Name == "God's Chalice" then
+                return true, item.Name
+            end
         end
     end
+
     return false, nil
 end
 
@@ -455,6 +530,7 @@ local function restoreNormalState()
     stopHoldingSpace()
     disableNoClip()
     unlockCamera()
+
     local character = player.Character
     if character then
         local humanoid = character:FindFirstChildOfClass("Humanoid")
@@ -464,10 +540,12 @@ local function restoreNormalState()
             humanoid.AutoRotate = true
         end
     end
+
     if invisibleSeat and invisibleSeat.Parent then
         invisibleSeat:Destroy()
         invisibleSeat = nil
     end
+
     if sitConnection then
         sitConnection:Disconnect()
         sitConnection = nil
@@ -483,29 +561,38 @@ end
 
 -- Teleport Boss
 local function teleportToIndra(bossPos)
-    if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then return end
+    if not player.Character or not player.Character:FindFirstChild("HumanoidRootPart") then
+        return
+    end
+
     teleportingToBoss = true
     stopAllActivities()
+
     local hrp = player.Character.HumanoidRootPart
     local aboveBoss = bossPos + Vector3.new(0, 15, 0)
     local distance = (hrp.Position - aboveBoss).Magnitude
     local tweenInfo = TweenInfo.new(distance / 250, Enum.EasingStyle.Linear)
     local tween = TweenService:Create(hrp, tweenInfo, {CFrame = CFrame.new(aboveBoss)})
+
     enableNoClip()
     lockCamera(aboveBoss)
+
     tween:Play()
     tween.Completed:Wait()
+
     wait(0.5)
+
     teleportingToBoss = false
     disableNoClip()
     unlockCamera()
+
     notify("BOSS FOUND!", "Đã tele tới rip_indra!")
 end
 
--- HỆ THỐNG HOP SERVER CHỐNG KẸT
+-- HỆ THỐNG HOP SERVER
 pcall(function()
     if not shared.TeleportErrorHandler then
-        shared.TeleportErrorHandler = TeleportService.TeleportInitFailed:Connect(function(plr, teleportResult, errorMessage)
+        shared.TeleportErrorHandler = TeleportService.TeleportInitFailed:Connect(function(plr)
             if plr == LocalPlayer then
                 isHopping = false
                 statusLabel.Text = "❌ Lỗi Teleport! Đang thử server khác..."
@@ -517,93 +604,145 @@ end)
 local mt = getrawmetatable(game)
 local oldNamecall = mt.__namecall
 setreadonly(mt, false)
+
 mt.__namecall = newcclosure(function(self, ...)
     local method = getnamecallmethod()
     local response = oldNamecall(self, ...)
+
     if not isHopping and (method == "InvokeServer" or method == "FireServer") and tostring(self.Name) == "__ServerBrowser" then
         if type(response) == "table" then
             task.defer(function()
-                if shared.FilterAndJump then shared.FilterAndJump(response) end
+                if shared.FilterAndJump then
+                    shared.FilterAndJump(response)
+                end
             end)
         end
     end
+
     return response
 end)
+
 setreadonly(mt, true)
 
+local function hopToJobId(jobId, stuckText)
+    local remoteBrowser = ReplicatedStorage:FindFirstChild("__ServerBrowser")
+    jobId = tostring(jobId or "")
+
+    if isHopping or not remoteBrowser or jobId == "" or jobId == tostring(game.JobId) then
+        return false
+    end
+
+    isHopping = true
+
+    local ok, err = pcall(function()
+        remoteBrowser:InvokeServer("teleport", jobId)
+    end)
+
+    if not ok then
+        isHopping = false
+        badServers[jobId] = true
+        warn("Remote teleport failed:", err)
+        statusLabel.Text = "❌ Remote teleport lỗi. Đang thử server khác..."
+        return false
+    end
+
+    task.delay(12, function()
+        if isHopping then
+            isHopping = false
+            badServers[jobId] = true
+            statusLabel.Text = stuckText or "❌ Teleport treo! Đang tìm lại..."
+        end
+    end)
+
+    return true
+end
+
 local function httpServerHop()
-    if isHopping then return end
+    if isHopping then
+        return
+    end
+
     statusLabel.Text = "🌐 Đang chuyển sang HTTP Hop..."
+
     local success, response = pcall(function()
         local url = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"
         return game:HttpGet(url)
     end)
+
     if success and response then
-        local data = HttpService:JSONDecode(response)
-        if data and data.data then
+        local decodeOk, data = pcall(function()
+            return HttpService:JSONDecode(response)
+        end)
+
+        if decodeOk and data and data.data then
             for _, server in ipairs(data.data) do
-                if server.id ~= game.JobId and not badServers[server.id] and server.playing >= targetCountMin and server.playing <= targetCountMax then
-                    isHopping = true
+                if server.id ~= game.JobId
+                    and not badServers[server.id]
+                    and server.playing >= targetCountMin
+                    and server.playing <= targetCountMax then
+
                     statusLabel.Text = "⚡ Tìm thấy server! Đang teleport..."
-                    pcall(function() 
-                        -- ĐÃ SỬA TẠI ĐÂY: Dùng RemoteEvent thay vì TeleportService
-                        ReplicatedStorage:WaitForChild("__ServerBrowser"):WaitForChild("RequestTeleportToServer"):FireServer(server.id)
-                    end)
-                    task.delay(12, function()
-                        if isHopping then
-                            isHopping = false
-                            badServers[server.id] = true
-                            statusLabel.Text = "❌ Teleport treo! Đang tìm lại..."
-                        end
-                    end)
-                    return
+                    if hopToJobId(server.id, "❌ Teleport treo! Đang tìm lại...") then
+                        return
+                    end
                 end
             end
         end
     end
-    if not isHopping then statusLabel.Text = "❌ HTTP chưa tìm ra server. Thử lại..." end
+
+    if not isHopping then
+        statusLabel.Text = "❌ HTTP chưa tìm ra server. Thử lại..."
+    end
 end
 
 local function serverHop()
-    if isHopping then return end
+    if isHopping then
+        return
+    end
+
     statusLabel.Text = "🔄 Khởi động Server Browser..."
     local startTime = tick()
+
     shared.FilterAndJump = function(serverList)
-        if isHopping or type(serverList) ~= "table" then return end
+        if isHopping or type(serverList) ~= "table" then
+            return
+        end
+
         local bestJobId = nil
+
         for jobId, info in pairs(serverList) do
             if type(info) == "table" then
                 local pCount = tonumber(info.Count) or 0
                 local pRegion = tostring(info.Region) or ""
-                if jobId ~= game.JobId and not badServers[jobId] and string.find(pRegion, targetRegion) and (pCount >= targetCountMin and pCount <= targetCountMax) then
+
+                if jobId ~= game.JobId
+                    and not badServers[jobId]
+                    and string.find(pRegion, targetRegion)
+                    and (pCount >= targetCountMin and pCount <= targetCountMax) then
                     bestJobId = jobId
-                    break 
+                    break
                 end
             end
         end
+
         if bestJobId then
-            isHopping = true
             statusLabel.Text = "⚡ Đã tìm thấy server! Đang teleport..."
-            pcall(function() 
-                -- ĐÃ SỬA TẠI ĐÂY: Dùng RemoteEvent thay vì TeleportService
-                ReplicatedStorage:WaitForChild("__ServerBrowser"):WaitForChild("RequestTeleportToServer"):FireServer(bestJobId)
-            end)
-            task.delay(12, function()
-                if isHopping then
-                    isHopping = false
-                    badServers[bestJobId] = true
-                    statusLabel.Text = "❌ Teleport bị treo! Đang thử lại..."
-                end
-            end)
+            hopToJobId(bestJobId, "❌ Teleport bị treo! Đang thử lại...")
         end
     end
 
     local function ClickRefresh()
         pcall(function()
             local gui = LocalPlayer.PlayerGui:FindFirstChild("ServerBrowser")
-            if not gui then return end
+            if not gui then
+                return
+            end
+
             local frame = gui:FindFirstChild("Frame")
-            if not frame then return end
+            if not frame then
+                return
+            end
+
             local refreshBtn = frame:FindFirstChild("Refresh")
             if refreshBtn and refreshBtn.Visible then
                 local x = refreshBtn.AbsolutePosition.X + (refreshBtn.AbsoluteSize.X / 2)
@@ -616,37 +755,53 @@ local function serverHop()
     end
 
     task.wait(1)
-    local ui = LocalPlayer:WaitForChild("PlayerGui"):FindFirstChild("ServerBrowser", 5)
+
+    local playerGui = LocalPlayer:WaitForChild("PlayerGui")
+    local ui = playerGui:WaitForChild("ServerBrowser", 5)
+
     if ui then
         ui.Enabled = true
+
         local frame = ui:FindFirstChild("Frame")
-        if frame then 
-            frame.Visible = true 
+        if frame then
+            frame.Visible = true
+
             local filters = frame:FindFirstChild("Filters")
-            if filters and filters:FindFirstChild("SearchRegion") and filters.SearchRegion:FindFirstChild("TextBox") then
-                filters.SearchRegion.TextBox.Text = targetRegion
+            local searchRegion = filters and filters:FindFirstChild("SearchRegion")
+            local textBox = searchRegion and searchRegion:FindFirstChild("TextBox")
+
+            if textBox then
+                textBox.Text = targetRegion
             end
         end
     else
         httpServerHop()
         return
     end
-    
+
     startTime = tick()
+
     task.spawn(function()
         while not isHopping do
             statusLabel.Text = "🔍 Đang quét server (" .. targetRegion .. ")..."
+
             pcall(function()
                 local remoteBrowser = ReplicatedStorage:FindFirstChild("__ServerBrowser")
-                if remoteBrowser then remoteBrowser:InvokeServer(1, targetRegion) else httpServerHop() end
+                if remoteBrowser then
+                    remoteBrowser:InvokeServer(1, targetRegion)
+                else
+                    httpServerHop()
+                end
             end)
+
             task.wait(3)
+
             if not isHopping then
                 if (tick() - startTime) >= 10 then
                     httpServerHop()
                     startTime = tick()
                 else
-                    if UserInputService.WindowFocused then ClickRefresh() end
+                    ClickRefresh()
                 end
             end
         end
@@ -662,15 +817,19 @@ spawn(function()
             if spawned then
                 indraSpawned = true
                 print("🔥 INDRA SPAWN: " .. bossName)
+
                 local posStr = math.floor(bossPos.X) .. ", " .. math.floor(bossPos.Y) .. ", " .. math.floor(bossPos.Z)
                 statusLabel.Text = string.format("⚔️ INDRA SPAWN!\n%s\n📍 %s", bossName, posStr)
                 statusLabel.TextColor3 = Color3.fromRGB(255, 100, 100)
+
                 notify("rip_indra Spawned! 🔥", "Boss: " .. bossName)
+
                 stopAllActivities()
                 wait(1)
                 teleportToIndra(bossPos)
             end
         end
+
         if indraSpawned then
             local spawned = checkIndra()
             if not spawned then
@@ -680,6 +839,7 @@ spawn(function()
                 break
             end
         end
+
         wait(2)
     end
 end)
@@ -720,25 +880,8 @@ spawn(function()
     end
 end)
 
-local function startHoldingSpace()
-    if spaceConnection then return end
-    spaceConnection = RunService.RenderStepped:Connect(function()
-        if autoTeleEnabled and not specialItemFound and not indraSpawned and not eliteBossPaused then
-            VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.Space, false, game)
-        end
-    end)
-end
-
-local function stopHoldingSpace()
-    if spaceConnection then
-        spaceConnection:Disconnect()
-        spaceConnection = nil
-        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.Space, false, game)
-    end
-end
-
 local function isChestNearby(pos)
-    for _, obj in ipairs(workspace:GetChildren()) do
+    for _, obj in ipairs(Workspace:GetChildren()) do
         if obj:IsA("Model") and obj.Name:find("Chest") and (obj:GetPivot().Position - pos).Magnitude < 20 then
             return true
         end
@@ -746,63 +889,66 @@ local function isChestNearby(pos)
     return false
 end
 
-function standUp()
-    if not isSitting then return end
-    isSitting = false
-    local humanoid = player.Character and player.Character:FindFirstChild("Humanoid")
-    if humanoid then
-        humanoid.Sit = false
-        humanoid.Jump = true
-    end
-    if invisibleSeat and invisibleSeat.Parent then
-        invisibleSeat:Destroy()
-        invisibleSeat = nil
-    end
-    if sitConnection then
-        sitConnection:Disconnect()
-        sitConnection = nil
-    end
-end
-
 local function sitDownWithJump()
-    if isSitting or indraSpawned or eliteBossPaused then return end
+    if isSitting or indraSpawned or eliteBossPaused then
+        return
+    end
+
     local character = player.Character or player.CharacterAdded:Wait()
     local humanoid = character:WaitForChild("Humanoid")
     local rootPart = character:WaitForChild("HumanoidRootPart")
-    if not humanoid or not rootPart then return end
-    
+    if not humanoid or not rootPart then
+        return
+    end
+
     isSitting = true
     humanoid.Jump = true
     wait(0.1)
+
     local sittingPosition = rootPart.CFrame
+
     invisibleSeat = Instance.new("Seat")
     invisibleSeat.Size = Vector3.new(2, 0.5, 2)
     invisibleSeat.Transparency = 1
     invisibleSeat.CanCollide = false
     invisibleSeat.Anchored = true
     invisibleSeat.CFrame = sittingPosition * CFrame.new(0, -2, 0)
-    invisibleSeat.Parent = workspace
+    invisibleSeat.Parent = Workspace
+
     wait(0.1)
+
     humanoid.Sit = true
     rootPart.CFrame = invisibleSeat.CFrame * CFrame.new(0, 2, 0)
-    
+
     sitConnection = RunService.Heartbeat:Connect(function()
         if isSitting and invisibleSeat and invisibleSeat.Parent and autoTeleEnabled and not specialItemFound and not indraSpawned and not eliteBossPaused then
             rootPart.CFrame = invisibleSeat.CFrame * CFrame.new(0, 2, 0)
             rootPart.Velocity = Vector3.new(0, 0, 0)
             rootPart.RotVelocity = Vector3.new(0, 0, 0)
         else
-            if sitConnection then sitConnection:Disconnect() sitConnection = nil end
-            if invisibleSeat and invisibleSeat.Parent then invisibleSeat:Destroy() invisibleSeat = nil end
+            if sitConnection then
+                sitConnection:Disconnect()
+                sitConnection = nil
+            end
+            if invisibleSeat and invisibleSeat.Parent then
+                invisibleSeat:Destroy()
+                invisibleSeat = nil
+            end
         end
     end)
 end
 
 local function teleportAndSit(pos)
-    if indraSpawned or eliteBossPaused then return end
+    if indraSpawned or eliteBossPaused then
+        return
+    end
+
     local character = player.Character or player.CharacterAdded:Wait()
     local rootPart = character:WaitForChild("HumanoidRootPart")
-    if not rootPart then return end
+    if not rootPart then
+        return
+    end
+
     standUp()
     rootPart.CFrame = CFrame.new(pos)
     sitDownWithJump()
@@ -814,9 +960,11 @@ local function safeResetCharacter()
     stopHoldingSpace()
     standUp()
     wait(1.5)
-    
-    if specialItemFound or indraSpawned or eliteBossPaused then return end
-    
+
+    if specialItemFound or indraSpawned or eliteBossPaused then
+        return
+    end
+
     local character = player.Character
     if character then
         local rootPart = character:FindFirstChild("HumanoidRootPart")
@@ -824,24 +972,25 @@ local function safeResetCharacter()
             rootPart.CFrame = CFrame.new(rootPart.Position.X, -1000, rootPart.Position.Z)
         end
     end
-    
+
     pcall(function()
         if character then
             local humanoid = character:FindFirstChildOfClass("Humanoid")
-            if humanoid then humanoid.Health = 0 end
+            if humanoid then
+                humanoid.Health = 0
+            end
         end
     end)
-    
+
     if wasAutoEnabled and not specialItemFound and not indraSpawned and not eliteBossPaused then
         autoTeleEnabled = true
     end
 end
 
--- HÀM CHECK VÀ RESET (Dùng chung để tránh lặp code)
 local function tryResetCharacter()
     if currentIndex % 10 == 1 and currentIndex > 1 then
         statusLabel.Text = string.format("🔄 Reset %d...\n⚔️ Indra: Chờ", currentIndex - 1)
-        
+
         local charAdded = false
         local conn = player.CharacterAdded:Connect(function()
             charAdded = true
@@ -849,15 +998,17 @@ local function tryResetCharacter()
                 startHoldingSpace()
             end
         end)
-        
+
         safeResetCharacter()
-        
+
         local timeout = 15
         local elapsed = 0
+
         while not charAdded and elapsed < timeout do
             wait(0.5)
             elapsed = elapsed + 0.5
         end
+
         conn:Disconnect()
         wait(1)
     end
@@ -868,72 +1019,25 @@ local function toggleAutoTele()
         statusLabel.Text = "⚠️ rip_indra spawn!\nKhông thể bật"
         return
     end
-    
+
     autoTeleEnabled = not autoTeleEnabled
-    
+
     if autoTeleEnabled then
         if specialItemFound then
             autoTeleEnabled = false
             statusLabel.Text = "⚠️ Đã tìm thấy Item!\nKhông bật lại được"
             return
         end
-        
+
         toggleBtn.Text = "⏸ DỪNG"
         toggleBtn.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
-        statusLabel.Text = "🔄 Đang chạy..."
-        startHoldingSpace()
-        
-        spawn(function()
-            while autoTeleEnabled and not specialItemFound and not indraSpawned do
-                if eliteBossPaused then
-                    statusLabel.Text = "⛔ DỪNG: Đang đánh Elite Boss..."
-                    standUp()
-                    stopHoldingSpace()
-                    wait(1)
-                    continue 
-                end
 
-                if currentIndex > #coords then
-                    autoTeleEnabled = false
-                    stopHoldingSpace()
-                    standUp()
-                    serverHop()
-                    break
-                end
-
-                local character = player.Character or player.CharacterAdded:Wait()
-                local beliValue = player:WaitForChild("Data"):WaitForChild("Beli")
-                local currentBeli = beliValue.Value
-
-                teleportAndSit(coords[currentIndex])
-                statusLabel.Text = string.format("📍 %d/%d\n💰 %d\n⚔️ Indra: Chờ", currentIndex, #coords, currentBeli)
-
-                wait(0.5)
-                if not isChestNearby(coords[currentIndex]) then
-                    currentIndex = currentIndex + 1
-                    tryResetCharacter() -- RESET KHI KHÔNG THẤY RƯƠNG
-                    continue
-                end
-
-                local waitTime = 0
-                local maxWait = 10
-                local gotBeli = false
-                while autoTeleEnabled and waitTime < maxWait do
-                    wait(0.5)
-                    waitTime = waitTime + 0.5
-                    if beliValue.Value > currentBeli then
-                        gotBeli = true
-                        break
-                    end
-                end
-                if not gotBeli then
-                    wait(5)
-                end
-
-                currentIndex = currentIndex + 1
-                tryResetCharacter() -- RESET KHI ĐÃ NHẶT RƯƠNG
-            end
-        end)
+        if eliteBossPaused then
+            statusLabel.Text = "⛔ DỪNG: Đang đánh Elite Boss..."
+        else
+            statusLabel.Text = "🔄 Đang chạy..."
+            startHoldingSpace()
+        end
     else
         toggleBtn.Text = "▶ BẮT ĐẦU"
         toggleBtn.BackgroundColor3 = Color3.fromRGB(50, 200, 100)
@@ -945,60 +1049,88 @@ end
 
 toggleBtn.MouseButton1Click:Connect(toggleAutoTele)
 
--- Auto Start
+-- AUTO START + MAIN LOOP
 autoTeleEnabled = true
+toggleBtn.Text = "⏸ DỪNG"
+toggleBtn.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+statusLabel.Text = "🔄 Đang chạy...\n⚔️ Indra: Chờ"
+
 spawn(function()
     while true do
-        if player.Character and not specialItemFound and not indraSpawned then
+        if autoTeleEnabled and player.Character and not specialItemFound and not indraSpawned then
             if currentIndex > #coords then
                 currentIndex = 1
+            end
+
+            if eliteBossPaused then
+                statusLabel.Text = "⛔ DỪNG: Đang đánh Elite Boss..."
+                standUp()
+                stopHoldingSpace()
+                wait(1)
+                continue
             end
 
             statusLabel.Text = "🔄 Đang chạy...\n⚔️ Indra: Chờ"
             startHoldingSpace()
 
-            while autoTeleEnabled and not specialItemFound and not indraSpawned and player.Character do
-                if eliteBossPaused then
-                    statusLabel.Text = "⛔ DỪNG: Đang đánh Elite Boss..."
-                    standUp()
-                    stopHoldingSpace()
-                    wait(1)
-                    continue 
-                end
+            if currentIndex > #coords then
+                stopHoldingSpace()
+                standUp()
+                serverHop()
+                wait(1)
+                continue
+            end
 
-                if currentIndex > #coords then
-                    stopHoldingSpace()
-                    standUp()
-                    serverHop()
+            local beliValue = player:WaitForChild("Data"):WaitForChild("Beli")
+            local currentBeli = beliValue.Value
+
+            teleportAndSit(coords[currentIndex])
+            statusLabel.Text = string.format("📍 %d/%d\n💰 %d\n⚔️ Indra: Chờ", currentIndex, #coords, currentBeli)
+
+            wait(0.5)
+
+            if not autoTeleEnabled or specialItemFound or indraSpawned then
+                wait(1)
+                continue
+            end
+
+            if not isChestNearby(coords[currentIndex]) then
+                currentIndex = currentIndex + 1
+                tryResetCharacter()
+                wait(0.2)
+                continue
+            end
+
+            local waitTime = 0
+            local maxWait = 10
+            local gotBeli = false
+
+            while autoTeleEnabled and waitTime < maxWait and not specialItemFound and not indraSpawned and not eliteBossPaused do
+                wait(0.5)
+                waitTime = waitTime + 0.5
+                if beliValue.Value > currentBeli then
+                    gotBeli = true
                     break
                 end
-
-                local character = player.Character
-                local beliValue = player:WaitForChild("Data"):WaitForChild("Beli")
-                local currentBeli = beliValue.Value
-
-                teleportAndSit(coords[currentIndex])
-                statusLabel.Text = string.format("📍 %d/%d\n💰 %d\n⚔️ Indra: Chờ", currentIndex, #coords, currentBeli)
-
-                wait(0.5)
-                if not isChestNearby(coords[currentIndex]) then
-                    currentIndex = currentIndex + 1
-                    tryResetCharacter() -- RESET TRONG AUTO START
-                    continue
-                end
-                
-                -- Giả lập chờ nhặt rương cho auto start (logic đơn giản hơn toggle)
-                wait(1.5) 
-                currentIndex = currentIndex + 1
-                tryResetCharacter() -- RESET TRONG AUTO START
             end
+
+            if not gotBeli and autoTeleEnabled and not specialItemFound and not indraSpawned then
+                wait(5)
+            end
+
+            currentIndex = currentIndex + 1
+            tryResetCharacter()
+        else
+            wait(1)
         end
-        wait(1)
+
+        wait(0.2)
     end
 end)
 
 player.CharacterAdded:Connect(function()
     wait(1)
+
     if specialItemFound then
         restoreNormalState()
     elseif indraSpawned then
@@ -1008,4 +1140,4 @@ player.CharacterAdded:Connect(function()
     end
 end)
 
-print("✅ Script Final Tích Hợp Anti-Stuck Hop: God Chalice + Indra + Elite + Auto Reset 10!")
+print("✅ Script Final Tích Hợp Remote Hop: __ServerBrowser teleport + God Chalice + Indra + Elite + Auto Reset 10!")
