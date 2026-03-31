@@ -158,6 +158,7 @@ Vector3.new(5898, 1206, 858),
 Vector3.new(6185, 370, -898),
 Vector3.new(6491, 626, 595),
 Vector3.new(6745, 221, -596)
+
 }
 
 -- Notification
@@ -544,7 +545,10 @@ local function httpServerHop()
                 if server.id ~= game.JobId and not badServers[server.id] and server.playing >= targetCountMin and server.playing <= targetCountMax then
                     isHopping = true
                     statusLabel.Text = "⚡ Tìm thấy server! Đang teleport..."
-                    pcall(function() TeleportService:TeleportToPlaceInstance(game.PlaceId, server.id, LocalPlayer) end)
+                    pcall(function() 
+                        -- ĐÃ SỬA TẠI ĐÂY: Dùng RemoteEvent thay vì TeleportService
+                        ReplicatedStorage:WaitForChild("__ServerBrowser"):WaitForChild("RequestTeleportToServer"):FireServer(server.id)
+                    end)
                     task.delay(12, function()
                         if isHopping then
                             isHopping = false
@@ -580,7 +584,10 @@ local function serverHop()
         if bestJobId then
             isHopping = true
             statusLabel.Text = "⚡ Đã tìm thấy server! Đang teleport..."
-            pcall(function() TeleportService:TeleportToPlaceInstance(game.PlaceId, bestJobId, LocalPlayer) end)
+            pcall(function() 
+                -- ĐÃ SỬA TẠI ĐÂY: Dùng RemoteEvent thay vì TeleportService
+                ReplicatedStorage:WaitForChild("__ServerBrowser"):WaitForChild("RequestTeleportToServer"):FireServer(bestJobId)
+            end)
             task.delay(12, function()
                 if isHopping then
                     isHopping = false
