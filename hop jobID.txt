@@ -4,6 +4,7 @@
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
 local HttpService = game:GetService("HttpService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage") -- Thêm service này
 
 local player = Players.LocalPlayer
 
@@ -110,13 +111,14 @@ task.spawn(function()
                     
                     isTeleporting = true -- Kích hoạt khóa
                     
-                    -- Dùng pcall để teleport, nếu lỗi thì mở lại khóa
+                    -- ĐÃ SỬA TẠI ĐÂY: Dùng InvokeServer qua RemoteFunction thay vì TeleportService
                     local success, err = pcall(function()
-                        TeleportService:TeleportToPlaceInstance(
-                            target.PlaceID,
-                            target.JobID,
-                            player
-                        )
+                        local remoteBrowser = ReplicatedStorage:WaitForChild("__ServerBrowser", 5)
+                        if remoteBrowser then
+                            remoteBrowser:InvokeServer("teleport", target.JobID)
+                        else
+                            error("Không tìm thấy Remote __ServerBrowser")
+                        end
                     end)
                     
                     if not success then
