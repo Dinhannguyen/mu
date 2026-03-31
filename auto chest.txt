@@ -590,6 +590,10 @@ local function teleportToIndra(bossPos)
 end
 
 -- HỆ THỐNG HOP SERVER
+-- random seed riêng cho mỗi acc để tránh nhảy trùng server
+math.randomseed(tick() + LocalPlayer.UserId)
+local lastTriedJob = nil
+
 pcall(function()
     if not shared.TeleportErrorHandler then
         shared.TeleportErrorHandler = TeleportService.TeleportInitFailed:Connect(function(plr)
@@ -601,6 +605,87 @@ pcall(function()
     end
 end)
 
+local function ClickRefresh()
+    pcall(function()
+        local gui = LocalPlayer.PlayerGui:FindFirstChild("ServerBrowser")
+        if not gui then return end
+        local frame = gui:FindFirstChild("Frame")
+        if not frame then return end
+  
+        local refreshBtn = frame:FindFirstChild("Refresh")
+        if refreshBtn and refreshBtn.Visible then
+            local x = refreshBtn.AbsolutePosition.X + (refreshBtn.AbsoluteSize.X / 2)
+            local y = refreshBtn.AbsolutePosition.Y + (refreshBtn.AbsoluteSize.Y / 2) + 58
+            VirtualInputManager:SendMouseButtonEvent(x, y, 0, true, game, 1)
+            task.wait(0.05)
+            VirtualInputManager:SendMouseButtonEvent(x, y, 0, false, game, 1)
+        end
+    end)
+end
+
+local function HopWithServerBrowser(jobId)
+    local remote = ReplicatedStorage:FindFirstChild("__ServerBrowser")
+    if remote then
+        statusLabel.Text = "⚡ Đang teleport tới server mới..."
+        pcall(function()
+            remote:InvokeServer("teleport", jobId)
+        end)
+    end
+end
+
+-- ✅ RANDOM SERVER TỪ DANH SÁCH ỨNG VIÊN
+local function FilterAndJump(serverList)
+    if isHopping or type(serverList) ~= "table" then return end
+
+    local candidates = {}
+
+    for jobId, info in pairs(serverList) do
+        if type(info) == "table" then
+            local pCount = tonumber(info.Count) or 0
+            local pRegion = tostring(info.Region) or ""
+
+            if jobId ~= game.JobId
+            and not badServers[jobId]
+            and string.find(pRegion, targetRegion)
+            and (pCount >= targetCountMin and pCount <= targetCountMax) then
+                table.insert(candidates, jobId)
+            end
+        end
+    end
+
+    if #candidates > 0 then
+        local chosenJob = candidates[math.random(1, #candidates)]
+
+        isHopping = true
+        lastTriedJob = chosenJob
+
+        HopWithServerBrowser(chosenJob)
+
+        -- retry nếu fail → chọn server khác
+        task.spawn(function()
+            task.wait(5)
+            if game.JobId == lastTriedJob then
+                isHopping = false
+                badServers[lastTriedJob] = true -- Đánh dấu server lỗi để không quay lại
+
+                statusLabel.Text = "❌ Teleport fail, đang đổi server..."
+                
+                if #candidates > 1 then
+                    local newJob
+                    repeat
+                        newJob = candidates[math.random(1, #candidates)]
+                    until newJob ~= lastTriedJob
+
+                    HopWithServerBrowser(newJob)
+                else
+                    HopWithServerBrowser(lastTriedJob)
+                end
+            end
+        end)
+    end
+end
+
+-- hook server browser
 local mt = getrawmetatable(game)
 local oldNamecall = mt.__namecall
 setreadonly(mt, false)
@@ -609,12 +694,12 @@ mt.__namecall = newcclosure(function(self, ...)
     local method = getnamecallmethod()
     local response = oldNamecall(self, ...)
 
-    if not isHopping and (method == "InvokeServer" or method == "FireServer") and tostring(self.Name) == "__ServerBrowser" then
+    if not isHopping
+    and (method == "InvokeServer" or method == "FireServer")
+    and tostring(self.Name) == "__ServerBrowser" then
         if type(response) == "table" then
             task.defer(function()
-                if shared.FilterAndJump then
-                    shared.FilterAndJump(response)
-                end
+                FilterAndJump(response)
             end)
         end
     end
@@ -624,173 +709,39 @@ end)
 
 setreadonly(mt, true)
 
-local function hopToJobId(jobId, stuckText)
-    local remoteBrowser = ReplicatedStorage:FindFirstChild("__ServerBrowser")
-    jobId = tostring(jobId or "")
-
-    if isHopping or not remoteBrowser or jobId == "" or jobId == tostring(game.JobId) then
-        return false
-    end
-
-    isHopping = true
-
-    local ok, err = pcall(function()
-        remoteBrowser:InvokeServer("teleport", jobId)
-    end)
-
-    if not ok then
-        isHopping = false
-        badServers[jobId] = true
-        warn("Remote teleport failed:", err)
-        statusLabel.Text = "❌ Remote teleport lỗi. Đang thử server khác..."
-        return false
-    end
-
-    task.delay(12, function()
-        if isHopping then
-            isHopping = false
-            badServers[jobId] = true
-            statusLabel.Text = stuckText or "❌ Teleport treo! Đang tìm lại..."
-        end
-    end)
-
-    return true
-end
-
-local function httpServerHop()
-    if isHopping then
-        return
-    end
-
-    statusLabel.Text = "🌐 Đang chuyển sang HTTP Hop..."
-
-    local success, response = pcall(function()
-        local url = "https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100"
-        return game:HttpGet(url)
-    end)
-
-    if success and response then
-        local decodeOk, data = pcall(function()
-            return HttpService:JSONDecode(response)
-        end)
-
-        if decodeOk and data and data.data then
-            for _, server in ipairs(data.data) do
-                if server.id ~= game.JobId
-                    and not badServers[server.id]
-                    and server.playing >= targetCountMin
-                    and server.playing <= targetCountMax then
-
-                    statusLabel.Text = "⚡ Tìm thấy server! Đang teleport..."
-                    if hopToJobId(server.id, "❌ Teleport treo! Đang tìm lại...") then
-                        return
-                    end
-                end
-            end
-        end
-    end
-
-    if not isHopping then
-        statusLabel.Text = "❌ HTTP chưa tìm ra server. Thử lại..."
-    end
-end
-
 local function serverHop()
-    if isHopping then
-        return
-    end
-
+    if isHopping then return end
+    
     statusLabel.Text = "🔄 Khởi động Server Browser..."
-    local startTime = tick()
-
-    shared.FilterAndJump = function(serverList)
-        if isHopping or type(serverList) ~= "table" then
-            return
-        end
-
-        local bestJobId = nil
-
-        for jobId, info in pairs(serverList) do
-            if type(info) == "table" then
-                local pCount = tonumber(info.Count) or 0
-                local pRegion = tostring(info.Region) or ""
-
-                if jobId ~= game.JobId
-                    and not badServers[jobId]
-                    and string.find(pRegion, targetRegion)
-                    and (pCount >= targetCountMin and pCount <= targetCountMax) then
-                    bestJobId = jobId
-                    break
-                end
-            end
-        end
-
-        if bestJobId then
-            statusLabel.Text = "⚡ Đã tìm thấy server! Đang teleport..."
-            hopToJobId(bestJobId, "❌ Teleport bị treo! Đang thử lại...")
-        end
-    end
-
-    local function ClickRefresh()
-        pcall(function()
-            local gui = LocalPlayer.PlayerGui:FindFirstChild("ServerBrowser")
-            if not gui then
-                return
-            end
-
-            local frame = gui:FindFirstChild("Frame")
-            if not frame then
-                return
-            end
-
-            local refreshBtn = frame:FindFirstChild("Refresh")
-            if refreshBtn and refreshBtn.Visible then
-                local x = refreshBtn.AbsolutePosition.X + (refreshBtn.AbsoluteSize.X / 2)
-                local y = refreshBtn.AbsolutePosition.Y + (refreshBtn.AbsoluteSize.Y / 2) + 58
-                VirtualInputManager:SendMouseButtonEvent(x, y, 0, true, game, 1)
-                task.wait(0.05)
-                VirtualInputManager:SendMouseButtonEvent(x, y, 0, false, game, 1)
-            end
-        end)
-    end
-
-    task.wait(1)
-
+    
     local playerGui = LocalPlayer:WaitForChild("PlayerGui")
     local ui = playerGui:WaitForChild("ServerBrowser", 5)
 
     if ui then
         ui.Enabled = true
-
         local frame = ui:FindFirstChild("Frame")
-        if frame then
-            frame.Visible = true
+        if frame then 
+            frame.Visible = true 
 
             local filters = frame:FindFirstChild("Filters")
-            local searchRegion = filters and filters:FindFirstChild("SearchRegion")
-            local textBox = searchRegion and searchRegion:FindFirstChild("TextBox")
-
-            if textBox then
-                textBox.Text = targetRegion
+            if filters 
+            and filters:FindFirstChild("SearchRegion") 
+            and filters.SearchRegion:FindFirstChild("TextBox") then
+                filters.SearchRegion.TextBox.Text = targetRegion
             end
         end
-    else
-        httpServerHop()
-        return
     end
-
-    startTime = tick()
+    
+    local startTime = tick()
 
     task.spawn(function()
         while not isHopping do
             statusLabel.Text = "🔍 Đang quét server (" .. targetRegion .. ")..."
-
+            
             pcall(function()
-                local remoteBrowser = ReplicatedStorage:FindFirstChild("__ServerBrowser")
-                if remoteBrowser then
-                    remoteBrowser:InvokeServer(1, targetRegion)
-                else
-                    httpServerHop()
+                local remote = ReplicatedStorage:FindFirstChild("__ServerBrowser")
+                if remote then
+                    remote:InvokeServer(1, targetRegion)
                 end
             end)
 
@@ -798,10 +749,28 @@ local function serverHop()
 
             if not isHopping then
                 if (tick() - startTime) >= 10 then
-                    httpServerHop()
+                    pcall(function()
+                        if ui then
+                            ui.Enabled = false
+                            task.wait(0.5)
+                            ui.Enabled = true
+
+                            if ui:FindFirstChild("Frame") then
+                                ui.Frame.Visible = true
+                            end
+                            
+                            local remote = ReplicatedStorage:FindFirstChild("__ServerBrowser")
+                            if remote then
+                                remote:InvokeServer(1, targetRegion)
+                            end
+                        end
+                    end)
+
                     startTime = tick()
                 else
-                    ClickRefresh()
+                    if UserInputService.WindowFocused then
+                        ClickRefresh()
+                    end
                 end
             end
         end
