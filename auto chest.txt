@@ -43,121 +43,121 @@ local badServers = {}
 -- TỌA ĐỘ RƯƠNG
 local coords = {
     Vector3.new(-16944, 71, 1130),
-Vector3.new(-16818, 221, 285),
-Vector3.new(-16599, 153, -166),
-Vector3.new(-16460, 365, 307),
-Vector3.new(-16451, 231, 234),
-Vector3.new(-16427, 243, 577),
-Vector3.new(-16224, 137, 1027),
-Vector3.new(-13742, 331, -7816),
-Vector3.new(-13590, 360, -8414),
-Vector3.new(-13568, 331, -8738),
-Vector3.new(-13537, 471, -9988),
-Vector3.new(-13491, 332, -7652),
-Vector3.new(-13458, 390, -9859),
-Vector3.new(-13426, 468, -6875),
-Vector3.new(-13274, 331, -7770),
-Vector3.new(-13043, 389, -10334),
-Vector3.new(-12986, 362, -8009),
-Vector3.new(-12972, 527, -6596),
-Vector3.new(-12635, 458, -7429),
-Vector3.new(-12488, 336, -7527),
-Vector3.new(-12480, 521, -10112),
-Vector3.new(-12152, 767, -6753),
-Vector3.new(-12116, 330, -10807),
-Vector3.new(-12049, 331, -9034),
-Vector3.new(-11874, 331, -10369),
-Vector3.new(-11821, 337, -9047),
-Vector3.new(-11673, 382, -10421),
-Vector3.new(-11179, 331, -10521),
-Vector3.new(-11154, 568, -8994),
-Vector3.new(-10768, 331, -8904),
-Vector3.new(-10596, 331, -9590),
-Vector3.new(-10488, 567, -10308),
-Vector3.new(-10246, 353, -9302),
-Vector3.new(-10145, 353, -9302),
-Vector3.new(-10122, 352, -9536),
-Vector3.new(-10095, 207, 6236),
-Vector3.new(-10054, 331, -8126),
-Vector3.new(-10053, 140, 5715),
-Vector3.new(-9664, 270, 6273),
-Vector3.new(-9576, 20, 4767),
-Vector3.new(-9544, 3455, 6705),
-Vector3.new(-9525, 3455, 6745),
-Vector3.new(-9522, 140, 6426),
-Vector3.new(-9499, 3455, 6707),
-Vector3.new(-9483, 141, 5496),
-Vector3.new(-9474, 5, 6374),
-Vector3.new(-8878, 140, 5933),
-Vector3.new(-8777, 141, 6277),
-Vector3.new(-8749, 141, 6277),
-Vector3.new(-5719, 313, -2893),
-Vector3.new(-5600, 312, -2719),
-Vector3.new(-5587, 312, -2162),
-Vector3.new(-5369, 313, -3035),
-Vector3.new(-5336, 312, -2840),
-Vector3.new(-5235, 312, -3203),
-Vector3.new(-5234, 1087, -2578),
-Vector3.new(-5117, 315, -3177),
-Vector3.new(-5076, 370, -3174),
-Vector3.new(-4949, 313, -3161),
-Vector3.new(-4924, 312, -2432),
-Vector3.new(-4920, 370, -2845),
-Vector3.new(-2752, 52, -13006),
-Vector3.new(-2553, 38, -12278),
-Vector3.new(-2511, 90, -12902),
-Vector3.new(-2411, 37, -10345),
-Vector3.new(-2376, 62, -10125),
-Vector3.new(-2325, 52, -13023),
-Vector3.new(-2263, 191, -10621),
-Vector3.new(-2116, 37, -10721),
-Vector3.new(-2089, 37, -10406),
-Vector3.new(-2083, 37, -10068),
-Vector3.new(-2072, 52, -12674),
-Vector3.new(-1827, 37, -10548),
-Vector3.new(-1821, 38, -12442),
-Vector3.new(-1648, 38, -12005),
-Vector3.new(-1620, 200, -12308),
-Vector3.new(-1088, 38, -11241),
-Vector3.new(-906, 71, -11470),
-Vector3.new(-849, 35, -10817),
-Vector3.new(-814, 66, -11180),
-Vector3.new(-572, 65, -11247),
-Vector3.new(-489, 65, -11056),
-Vector3.new(-472, 230, -11044),
-Vector3.new(-408, 65, -10861),
-Vector3.new(-60, 16, -12057),
-Vector3.new(141, 24, -12438),
-Vector3.new(217, 125, -12599),
-Vector3.new(289, 24, -12842),
-Vector3.new(300, 24, -12570),
-Vector3.new(327, 24, -12909),
-Vector3.new(501, 58, -13075),
-Vector3.new(703, 194, -12371),
-Vector3.new(1799, 26, -7100),
-Vector3.new(2599, 189, -7288),
-Vector3.new(2841, 114, -7791),
-Vector3.new(2876, 508, -7217),
-Vector3.new(2933, 73, -8094),
-Vector3.new(3242, 559, -7425),
-Vector3.new(3754, 13, -2429),
-Vector3.new(3941, 202, -1613),
-Vector3.new(3989, 145, -7187),
-Vector3.new(4370, 1251, 584),
-Vector3.new(4445, 565, -6013),
-Vector3.new(4873, 174, -1128),
-Vector3.new(5173, 174, -1128),
-Vector3.new(5322, 1029, -50),
-Vector3.new(5449, 1003, 246),
-Vector3.new(5520, 1003, -4),
-Vector3.new(5589, 1331, 482),
-Vector3.new(5780, 1208, 794),
-Vector3.new(5831, 1012, -229),
-Vector3.new(5885, 1208, 850),
-Vector3.new(5898, 1206, 858),
-Vector3.new(6185, 370, -898),
-Vector3.new(6491, 626, 595),
-Vector3.new(6745, 221, -596)
+    Vector3.new(-16818, 221, 285),
+    Vector3.new(-16599, 153, -166),
+    Vector3.new(-16460, 365, 307),
+    Vector3.new(-16451, 231, 234),
+    Vector3.new(-16427, 243, 577),
+    Vector3.new(-16224, 137, 1027),
+    Vector3.new(-13742, 331, -7816),
+    Vector3.new(-13590, 360, -8414),
+    Vector3.new(-13568, 331, -8738),
+    Vector3.new(-13537, 471, -9988),
+    Vector3.new(-13491, 332, -7652),
+    Vector3.new(-13458, 390, -9859),
+    Vector3.new(-13426, 468, -6875),
+    Vector3.new(-13274, 331, -7770),
+    Vector3.new(-13043, 389, -10334),
+    Vector3.new(-12986, 362, -8009),
+    Vector3.new(-12972, 527, -6596),
+    Vector3.new(-12635, 458, -7429),
+    Vector3.new(-12488, 336, -7527),
+    Vector3.new(-12480, 521, -10112),
+    Vector3.new(-12152, 767, -6753),
+    Vector3.new(-12116, 330, -10807),
+    Vector3.new(-12049, 331, -9034),
+    Vector3.new(-11874, 331, -10369),
+    Vector3.new(-11821, 337, -9047),
+    Vector3.new(-11673, 382, -10421),
+    Vector3.new(-11179, 331, -10521),
+    Vector3.new(-11154, 568, -8994),
+    Vector3.new(-10768, 331, -8904),
+    Vector3.new(-10596, 331, -9590),
+    Vector3.new(-10488, 567, -10308),
+    Vector3.new(-10246, 353, -9302),
+    Vector3.new(-10145, 353, -9302),
+    Vector3.new(-10122, 352, -9536),
+    Vector3.new(-10095, 207, 6236),
+    Vector3.new(-10054, 331, -8126),
+    Vector3.new(-10053, 140, 5715),
+    Vector3.new(-9664, 270, 6273),
+    Vector3.new(-9576, 20, 4767),
+    Vector3.new(-9544, 3455, 6705),
+    Vector3.new(-9525, 3455, 6745),
+    Vector3.new(-9522, 140, 6426),
+    Vector3.new(-9499, 3455, 6707),
+    Vector3.new(-9483, 141, 5496),
+    Vector3.new(-9474, 5, 6374),
+    Vector3.new(-8878, 140, 5933),
+    Vector3.new(-8777, 141, 6277),
+    Vector3.new(-8749, 141, 6277),
+    Vector3.new(-5719, 313, -2893),
+    Vector3.new(-5600, 312, -2719),
+    Vector3.new(-5587, 312, -2162),
+    Vector3.new(-5369, 313, -3035),
+    Vector3.new(-5336, 312, -2840),
+    Vector3.new(-5235, 312, -3203),
+    Vector3.new(-5234, 1087, -2578),
+    Vector3.new(-5117, 315, -3177),
+    Vector3.new(-5076, 370, -3174),
+    Vector3.new(-4949, 313, -3161),
+    Vector3.new(-4924, 312, -2432),
+    Vector3.new(-4920, 370, -2845),
+    Vector3.new(-2752, 52, -13006),
+    Vector3.new(-2553, 38, -12278),
+    Vector3.new(-2511, 90, -12902),
+    Vector3.new(-2411, 37, -10345),
+    Vector3.new(-2376, 62, -10125),
+    Vector3.new(-2325, 52, -13023),
+    Vector3.new(-2263, 191, -10621),
+    Vector3.new(-2116, 37, -10721),
+    Vector3.new(-2089, 37, -10406),
+    Vector3.new(-2083, 37, -10068),
+    Vector3.new(-2072, 52, -12674),
+    Vector3.new(-1827, 37, -10548),
+    Vector3.new(-1821, 38, -12442),
+    Vector3.new(-1648, 38, -12005),
+    Vector3.new(-1620, 200, -12308),
+    Vector3.new(-1088, 38, -11241),
+    Vector3.new(-906, 71, -11470),
+    Vector3.new(-849, 35, -10817),
+    Vector3.new(-814, 66, -11180),
+    Vector3.new(-572, 65, -11247),
+    Vector3.new(-489, 65, -11056),
+    Vector3.new(-472, 230, -11044),
+    Vector3.new(-408, 65, -10861),
+    Vector3.new(-60, 16, -12057),
+    Vector3.new(141, 24, -12438),
+    Vector3.new(217, 125, -12599),
+    Vector3.new(289, 24, -12842),
+    Vector3.new(300, 24, -12570),
+    Vector3.new(327, 24, -12909),
+    Vector3.new(501, 58, -13075),
+    Vector3.new(703, 194, -12371),
+    Vector3.new(1799, 26, -7100),
+    Vector3.new(2599, 189, -7288),
+    Vector3.new(2841, 114, -7791),
+    Vector3.new(2876, 508, -7217),
+    Vector3.new(2933, 73, -8094),
+    Vector3.new(3242, 559, -7425),
+    Vector3.new(3754, 13, -2429),
+    Vector3.new(3941, 202, -1613),
+    Vector3.new(3989, 145, -7187),
+    Vector3.new(4370, 1251, 584),
+    Vector3.new(4445, 565, -6013),
+    Vector3.new(4873, 174, -1128),
+    Vector3.new(5173, 174, -1128),
+    Vector3.new(5322, 1029, -50),
+    Vector3.new(5449, 1003, 246),
+    Vector3.new(5520, 1003, -4),
+    Vector3.new(5589, 1331, 482),
+    Vector3.new(5780, 1208, 794),
+    Vector3.new(5831, 1012, -229),
+    Vector3.new(5885, 1208, 850),
+    Vector3.new(5898, 1206, 858),
+    Vector3.new(6185, 370, -898),
+    Vector3.new(6491, 626, 595),
+    Vector3.new(6745, 221, -596)
 }
 
 -- Notification
@@ -599,7 +599,7 @@ pcall(function()
         shared.TeleportErrorHandler = TeleportService.TeleportInitFailed:Connect(function(plr)
             if plr == LocalPlayer then
                 isHopping = false
-                statusLabel.Text = "❌ Lỗi Teleport! Đang thử server khác..."
+                statusLabel.Text = "❌ Lỗi Teleport!\nĐang thử server khác..."
             end
         end)
     end
@@ -758,7 +758,7 @@ local function serverHop()
                             if ui:FindFirstChild("Frame") then
                                 ui.Frame.Visible = true
                             end
-                            
+                             
                             local remote = ReplicatedStorage:FindFirstChild("__ServerBrowser")
                             if remote then
                                 remote:InvokeServer(1, targetRegion)
@@ -1027,9 +1027,6 @@ statusLabel.Text = "🔄 Đang chạy...\n⚔️ Indra: Chờ"
 spawn(function()
     while true do
         if autoTeleEnabled and player.Character and not specialItemFound and not indraSpawned then
-            if currentIndex > #coords then
-                currentIndex = 1
-            end
 
             if eliteBossPaused then
                 statusLabel.Text = "⛔ DỪNG: Đang đánh Elite Boss..."
@@ -1042,11 +1039,13 @@ spawn(function()
             statusLabel.Text = "🔄 Đang chạy...\n⚔️ Indra: Chờ"
             startHoldingSpace()
 
+            -- [ĐÃ SỬA TẠI ĐÂY]: Chỉ kiểm tra và hop khi vượt quá số lượng rương
             if currentIndex > #coords then
                 stopHoldingSpace()
                 standUp()
+                currentIndex = 1 -- Phục hồi biến về 1 để đề phòng lỗi hop thì loop sẽ thử farm lại rương server đó
                 serverHop()
-                wait(1)
+                wait(5) -- Đợi server hop được tiến hành
                 continue
             end
 
@@ -1109,4 +1108,4 @@ player.CharacterAdded:Connect(function()
     end
 end)
 
-print("✅ Script Final Tích Hợp Remote Hop: __ServerBrowser teleport + God Chalice + Indra + Elite + Auto Reset 10!")
+print("✅ Script Final Tích Hợp Remote Hop: __ServerBrowser teleport + God Chalice + Indra + Elite + Auto Reset 10! (Fixed Loop Hop)")
